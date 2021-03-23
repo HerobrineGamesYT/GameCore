@@ -4,11 +4,12 @@ import org.bukkit.ChatColor;
 
 public enum Games {
 
-	BLOCK_HUNT(ChatColor.GREEN + "Block Hunt", "bh", ChatColor.GREEN, false, true, true, true),
-	MLG_RUSH(ChatColor.RED + "MLG Rush", "mlg", ChatColor.RED, false, false, false, false),
-	BEDWARS(ChatColor.LIGHT_PURPLE + "Bedwars", "bw", ChatColor.LIGHT_PURPLE, true, true, false, false),
-	SKYWARS(ChatColor.GOLD + "Skywars", "sw", ChatColor.GOLD, true, false, false, false),
-	FALL_CRAFT(ChatColor.AQUA + "Fall Craft", "fc", ChatColor.AQUA, false, false, false, false);
+	BLOCK_HUNT(ChatColor.GREEN + "Block Hunt", "bh", ChatColor.GREEN, false, true, true, true, false),
+	MLG_RUSH(ChatColor.RED + "MLG Rush", "mlg", ChatColor.RED, false, false, false, false, false),
+	BEDWARS(ChatColor.LIGHT_PURPLE + "Bedwars", "bw", ChatColor.LIGHT_PURPLE, true, true, false, false, false),
+	SKYWARS(ChatColor.GOLD + "Skywars", "sw", ChatColor.GOLD, true, false, false, false, true),
+	FALL_CRAFT(ChatColor.AQUA + "Fall Craft", "fc", ChatColor.AQUA, false, false, false, false, false),
+	CLASH_ROYALE(ChatColor.AQUA + "Battle Clash", "bc", ChatColor.AQUA, true, true, false, false, true);
 
 	private String display;
 	private String key;
@@ -17,9 +18,10 @@ public enum Games {
 	private boolean isTeamGame;
 	private boolean hasVoting;
 	private boolean newWorldEachGame;
+	private boolean hasKits;
 
 	private Games(String display, String key, ChatColor color, boolean isPVPGame, boolean isTeamGame, boolean hasVoting,
-			boolean newWorldEachGame) {
+			boolean newWorldEachGame, boolean hasKits) {
 		this.display = display;
 		this.key = key;
 		this.color = color;
@@ -27,6 +29,7 @@ public enum Games {
 		this.isTeamGame = isTeamGame;
 		this.hasVoting = hasVoting;
 		this.newWorldEachGame = newWorldEachGame;
+		this.hasKits = hasKits;
 
 	}
 
@@ -56,6 +59,10 @@ public enum Games {
 
 	public boolean requiresNewWorld() {
 		return newWorldEachGame;
+	}
+
+	public boolean hasKits() {
+		return hasKits;
 	}
 
 }

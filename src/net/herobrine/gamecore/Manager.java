@@ -126,6 +126,28 @@ public class Manager {
 
 	}
 
+	public static boolean hasKit(Player player) {
+		if (isPlaying(player)) {
+			if (getArena(player).getClasses().containsKey(player.getUniqueId())) {
+				return true;
+			}
+
+		}
+		return false;
+	}
+
+	public static ClassTypes getKit(Player player) {
+		if (isPlaying(player)) {
+			if (getArena(player).getClasses().containsKey(player.getUniqueId())) {
+				return getArena(player).getClasses().get(player.getUniqueId()).getClassType();
+			} else {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
 	public static void setArenaType(GameType type, int id) {
 
 		Arena arena = getArena(id);

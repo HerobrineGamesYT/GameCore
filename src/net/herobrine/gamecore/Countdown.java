@@ -124,7 +124,8 @@ public class Countdown extends BukkitRunnable {
 
 		if (seconds == 15 || seconds <= 10 || seconds % 10 == 0) {
 			if (seconds == 15 || seconds > 15) {
-				arena.sendMessage(ChatColor.YELLOW + "The game starts in " + ChatColor.GREEN + seconds + " seconds!");
+				arena.sendMessage(ChatColor.YELLOW + "The game starts in " + ChatColor.GREEN + seconds
+						+ ChatColor.YELLOW + " seconds!");
 				arena.playCountdownSounds();
 
 			}
@@ -143,7 +144,8 @@ public class Countdown extends BukkitRunnable {
 
 				arena.sendTitle("&c" + seconds, subtitle, 0, 1, 0);
 			} else if (seconds == 2 || seconds == 3 || seconds == 4 || seconds == 5) {
-				arena.sendMessage(ChatColor.YELLOW + "The game starts in " + ChatColor.RED + seconds + " seconds!");
+				arena.sendMessage(ChatColor.YELLOW + "The game starts in " + ChatColor.RED + seconds + ChatColor.YELLOW
+						+ " seconds!");
 				arena.playCountdownSounds();
 				String subtitle;
 
@@ -158,8 +160,8 @@ public class Countdown extends BukkitRunnable {
 				arena.sendTitle("&c" + seconds, subtitle, 0, 1, 0);
 			} else {
 				if (seconds != 15 && seconds < 15) {
-					arena.sendMessage(
-							ChatColor.YELLOW + "The game starts in " + ChatColor.GOLD + seconds + " seconds!");
+					arena.sendMessage(ChatColor.YELLOW + "The game starts in " + ChatColor.GOLD + seconds
+							+ ChatColor.YELLOW + " seconds!");
 				}
 
 			}

@@ -93,7 +93,8 @@ public class GameCoreMain extends JavaPlugin {
 					|| arena.getState() == GameState.COUNTDOWN && arena.getGame(arena.getID()).equals(game)) {
 				if (arena.getPlayers().size() < Config.getMaxPlayers(arena.getID())) {
 
-					if (!arena.getState().equals(GameState.LIVE) && arena.canJoin()) {
+					if (!arena.getState().equals(GameState.LIVE) && arena.canJoin()
+							&& arena.getGame(arena.getID()).equals(game)) {
 
 						arena.addPlayer(player);
 						player.sendMessage(ChatColor.GREEN + "Game found! You've been sent to game " + ChatColor.GOLD

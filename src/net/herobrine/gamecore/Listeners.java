@@ -27,6 +27,8 @@ public class Listeners implements Listener {
 
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().teleport(Config.getLobbySpawn());
+		e.getPlayer().setExp(0.0F);
+		e.getPlayer().setLevel(0);
 
 	}
 
@@ -113,6 +115,8 @@ public class Listeners implements Listener {
 
 			if (Manager.getArena(player).getSpectators().contains(player.getUniqueId())) {
 				e.setCancelled(true);
+			} else if (!Manager.getArena(player).getGame(Manager.getArena(player).getID()).equals(Games.BLOCK_HUNT)) {
+				e.setCancelled(true);
 			}
 		}
 
@@ -123,6 +127,10 @@ public class Listeners implements Listener {
 		Player player = e.getPlayer();
 		if (Manager.isPlaying(player)) {
 			if (Manager.getArena(player).getSpectators().contains(player.getUniqueId())) {
+				e.setCancelled(true);
+			}
+
+			else if (!Manager.getArena(player).getGame(Manager.getArena(player).getID()).equals(Games.BLOCK_HUNT)) {
 				e.setCancelled(true);
 			}
 		}

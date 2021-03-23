@@ -31,6 +31,11 @@ import org.bukkit.scoreboard.Team;
 
 import com.google.common.collect.TreeMultimap;
 
+import net.herobrine.clashroyale.Archer;
+import net.herobrine.clashroyale.Bandit;
+import net.herobrine.clashroyale.ClashRoyaleGame;
+import net.herobrine.clashroyale.Knight;
+import net.herobrine.clashroyale.Wizard;
 import net.herobrine.core.HerobrinePVPCore;
 import net.herobrine.wallsg.BlockHuntGame;
 import net.herobrine.wallsg.ModifiedTypes;
@@ -41,6 +46,7 @@ public class Arena {
 	private int id;
 	private ArrayList<UUID> players;
 	private HashMap<UUID, Teams> teams;
+	private HashMap<UUID, Class> classes;
 	private ArrayList<ModifiedTypes> bhModifiers;
 	private ArrayList<UUID> spectators;
 	private Location spawn;
@@ -48,6 +54,7 @@ public class Arena {
 	private GameType type;
 	private Countdown countdown;
 	private BlockHuntGame blockHuntGame;
+	private ClashRoyaleGame clashRoyaleGame;
 	private boolean canJoin;
 
 	public void freezeEntity(Entity en) {
@@ -63,6 +70,7 @@ public class Arena {
 
 		players = new ArrayList<>();
 		teams = new HashMap<>();
+		classes = new HashMap<>();
 		type = GameType.VANILLA;
 		spawn = Config.getArenaSpawn(id);
 		spawn.getWorld().setGameRuleValue("keepInventory", "true");
@@ -92,6 +100,8 @@ public class Arena {
 
 		else if (getGame(id).equals(Games.BEDWARS)) {
 			// game = new BedwarsGame(this);
+		} else if (getGame(id).equals(Games.CLASH_ROYALE)) {
+			clashRoyaleGame = new ClashRoyaleGame(this);
 		}
 
 		else {
@@ -119,6 +129,8 @@ public class Arena {
 
 		else if (getGame(id).equals(Games.BEDWARS)) {
 			// bedwarsGame.start
+		} else if (getGame(id).equals(Games.CLASH_ROYALE)) {
+			clashRoyaleGame.start();
 		}
 
 		else {
@@ -131,6 +143,7 @@ public class Arena {
 	public void reset() {
 
 		for (UUID uuid : players) {
+			removeClass(uuid);
 			Player player = Bukkit.getPlayer(uuid);
 			removeSpectator(player);
 			player.setDisplayName(player.getName());
@@ -138,10 +151,12 @@ public class Arena {
 			player.getEquipment().setChestplate(null);
 			player.getEquipment().setLeggings(null);
 			player.getEquipment().setBoots(null);
-
+			player.setExp(0.0F);
+			player.setLevel(0);
 			player.getInventory().clear();
 			player.setHealth(20.0);
 			player.getEnderChest().clear();
+			player.setDisplayName(player.getName());
 
 			for (PotionEffect effect : player.getActivePotionEffects()) {
 
@@ -177,6 +192,7 @@ public class Arena {
 				wc.type(WorldType.NORMAL);
 
 				wc.createWorld();
+				Bukkit.getWorld("bhMap" + id).setGameRuleValue("keepInventory", "true");
 			}
 
 			System.gc();
@@ -200,7 +216,6 @@ public class Arena {
 
 		countdown = new Countdown(this);
 
-		Bukkit.getWorld("bhMap" + id).setGameRuleValue("keepInventory", "true");
 		spawn = Config.getArenaSpawn(id);
 		System.gc();
 		canJoin = true;
@@ -274,6 +289,14 @@ public class Arena {
 			player.getInventory().setItem(0, voteItem);
 		}
 
+		if (getGame(id).hasKits()) {
+
+			ItemStack classSelector = new ItemStack(Material.BOOKSHELF);
+			ItemMeta classSelectorMeta = classSelector.getItemMeta();
+			classSelectorMeta.setDisplayName(ChatColor.AQUA + "Class Selector");
+			classSelector.setItemMeta(classSelectorMeta);
+			player.getInventory().setItem(0, classSelector);
+		}
 		if (getGame(id).equals(Games.BLOCK_HUNT)) {
 			ItemStack howToPlay = new ItemStack(Material.WRITTEN_BOOK);
 			BookMeta howToPlayMeta = (BookMeta) howToPlay.getItemMeta();
@@ -382,6 +405,7 @@ public class Arena {
 	public void removePlayer(Player player) {
 		players.remove(player.getUniqueId());
 		removeTeam(player);
+		removeClass(player.getUniqueId());
 		if (getState() != GameState.LIVE) {
 			for (UUID uuid : players) {
 				Player player2 = Bukkit.getPlayer(uuid);
@@ -413,6 +437,10 @@ public class Arena {
 		return id;
 	}
 
+	public HashMap<UUID, Class> getClasses() {
+		return classes;
+	}
+
 	public ArrayList<UUID> getSpectators() {
 		return spectators;
 	}
@@ -423,6 +451,45 @@ public class Arena {
 
 	public GameState getState() {
 		return state;
+	}
+
+	public void removeClass(UUID uuid) {
+		if (classes.containsKey(uuid)) {
+			classes.get(uuid).remove();
+			classes.remove(uuid);
+		}
+	}
+
+	public void setClass(UUID uuid, ClassTypes type) {
+		removeClass(uuid);
+		switch (type) {
+		case BANDIT:
+			classes.put(uuid, new Bandit(uuid));
+			break;
+
+		case WIZARD:
+			classes.put(uuid, new Wizard(uuid));
+			break;
+		case KNIGHT:
+			classes.put(uuid, new Knight(uuid));
+			break;
+
+		case ARCHER:
+			classes.put(uuid, new Archer(uuid));
+			break;
+		default:
+			break;
+		}
+	}
+
+	public ClassTypes getClass(Player player) {
+
+		return classes.get(player.getUniqueId()).getClassType();
+
+	}
+
+	public ClassTypes getClass(UUID uuid) {
+		return classes.get(uuid).getClassType();
 	}
 
 	public GameType getType() {

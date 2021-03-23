@@ -25,13 +25,14 @@ arenas:
     z: -13
     pitch: 0
     yaw: 0
-  #'1':
-  #  game-type: mlg
-  #  required-players: 2
-  #  max-players: 10
-  #  world: 'world'
-  #  x: 20
-  #  y: 65
-  #  z: 107
-  #  pitch: 60
-  #  yaw: 60
+  '1':
+    game-type: 'bc'
+    required-players: 2
+    max-players: 10
+    game-world: 'arena10'
+    world: 'arena10'
+    x: 172
+    y: 32
+    z: -1436
+    pitch: -1
+    yaw: 7
