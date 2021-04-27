@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.herobrine.core.HerobrinePVPCore;
 import net.herobrine.wallsg.BlockHuntMain;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent.ChatSerializer;
+import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle.EnumTitleAction;
@@ -52,6 +53,8 @@ public class GameCoreMain extends JavaPlugin {
 		getCommand("arena").setExecutor(new ArenaCommand());
 
 		getCommand("staffchat").setExecutor(new StaffChatCommand());
+
+		getCommand("skin").setExecutor(new SkinCommand());
 
 	}
 
@@ -135,6 +138,12 @@ public class GameCoreMain extends JavaPlugin {
 
 		((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(titlePacket);
 		((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(subTitlePacket);
+
+	}
+
+	public void sendPacket(Player player, Packet<?> packet) {
+
+		((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(packet);
 
 	}
 

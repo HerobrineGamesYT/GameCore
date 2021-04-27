@@ -10,4 +10,5 @@ commands:
   staffchat:
     description: Send a message to all staff members.
     aliases: [sc]
- 
+  skin:
+    description: Set your skin! (BETA)

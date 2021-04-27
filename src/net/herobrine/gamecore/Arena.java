@@ -1,6 +1,7 @@
 package net.herobrine.gamecore;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -33,8 +35,10 @@ import com.google.common.collect.TreeMultimap;
 
 import net.herobrine.clashroyale.Archer;
 import net.herobrine.clashroyale.Bandit;
+import net.herobrine.clashroyale.BattleHealer;
 import net.herobrine.clashroyale.ClashRoyaleGame;
 import net.herobrine.clashroyale.Knight;
+import net.herobrine.clashroyale.Witch;
 import net.herobrine.clashroyale.Wizard;
 import net.herobrine.core.HerobrinePVPCore;
 import net.herobrine.wallsg.BlockHuntGame;
@@ -174,6 +178,11 @@ public class Arena {
 			player.teleport(Config.getLobbySpawn());
 			player.getInventory().setItem(0, gameSelector);
 
+			if (getGame(id).requiresNewWorld()) {
+				player.sendMessage(
+						ChatColor.RED + "A new world is generating for the game you just played, lag incoming!");
+			}
+
 		}
 		type = GameType.VANILLA;
 		state = GameState.RECRUITING;
@@ -181,10 +190,20 @@ public class Arena {
 		teams.clear();
 		if (getGame(id).equals(Games.BLOCK_HUNT)) {
 			blockHuntGame.getList().clear();
+			canJoin = false;
 			if (getGame(id).requiresNewWorld()) {
 
-				Bukkit.getWorld("bhMap" + id).getWorldFolder().delete();
-				canJoin = false;
+				World world = Bukkit.getWorld("bhMap" + id);
+
+				Bukkit.unloadWorld(Bukkit.getWorld("bhMap" + id), false);
+
+				try {
+					FileUtils.deleteDirectory(world.getWorldFolder());
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				}
+
 				WorldCreator wc = new WorldCreator("bhMap" + id);
 
 				wc.environment(Environment.NORMAL);
@@ -199,7 +218,15 @@ public class Arena {
 			// blockHuntGame = new BlockHuntGame(this);
 			// is deprecated in favor of the new localized runnable system in each game
 			// class
-		} else if (getGame(id).equals(Games.MLG_RUSH)) {
+		}
+
+		else if (getGame(id).equals(Games.CLASH_ROYALE)) {
+			for (Entity ent : Config.getGameWorld(id).getEntities()) {
+				ent.remove();
+			}
+		}
+
+		else if (getGame(id).equals(Games.MLG_RUSH)) {
 			System.gc();
 			// game = new MLGRushGame(this);
 		}
@@ -476,6 +503,14 @@ public class Arena {
 
 		case ARCHER:
 			classes.put(uuid, new Archer(uuid));
+			break;
+
+		case HEALER:
+			classes.put(uuid, new BattleHealer(uuid));
+			break;
+
+		case WITCH:
+			classes.put(uuid, new Witch(uuid));
 			break;
 		default:
 			break;

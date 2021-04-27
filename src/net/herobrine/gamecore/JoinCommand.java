@@ -20,8 +20,7 @@ public class JoinCommand implements CommandExecutor {
 				for (Arena arena : Manager.getArenas()) {
 					player.sendMessage(ChatColor.AQUA + "- " + arena.getID());
 				}
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-						"&c&lDEVELOPER NOTE: ONLY JOIN MAP 0, IT IS THE ONLY ONE THAT IS FUNCTIONAL! IF YOU JOIN MAP 1, THERE WILL BE SEVERAL ERRORS AND BUGS AS THE MAP HAS NOT BEEN SET UP!"));
+
 			}
 			if (args.length == 1) {
 				if (!Manager.isPlaying(player)) {
@@ -51,8 +50,7 @@ public class JoinCommand implements CommandExecutor {
 						for (Arena arena : Manager.getArenas()) {
 							player.sendMessage(ChatColor.AQUA + "- " + arena.getID());
 						}
-						player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-								"&c&lDEVELOPER NOTE: ONLY JOIN MAP 0, IT IS THE ONLY ONE THAT IS FUNCTIONAL! IF YOU JOIN MAP 1, THERE WILL BE SEVERAL ERRORS AND BUGS AS THE MAP HAS NOT BEEN SET UP!"));
+
 					}
 				} else {
 					player.sendMessage(ChatColor.RED + "You are already in a game!");

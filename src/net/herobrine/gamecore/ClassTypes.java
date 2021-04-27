@@ -23,7 +23,15 @@ public enum ClassTypes {
 			Games.CLASH_ROYALE, false),
 	ARCHER(ChatColor.RED + "Archer", Material.BOW,
 			new String[] { ChatColor.GRAY + "Kit Items:", ChatColor.BLUE + "1x Bow (Power 13)" }, Games.CLASH_ROYALE,
-			false);
+			false),
+	HEALER(ChatColor.GOLD + "Battle Healer", Material.GOLDEN_APPLE,
+			new String[] { ChatColor.GOLD + "Healer", ChatColor.GOLD + "- Attacks heal teammates in a 3 block radius" },
+			Games.CLASH_ROYALE, false),
+	WITCH(ChatColor.LIGHT_PURPLE + "Witch", Material.BONE,
+			new String[] { ChatColor.LIGHT_PURPLE + "Summoner", ChatColor.GOLD + "Abilities:",
+					ChatColor.LIGHT_PURPLE + "- Can Summon Skeletons (Cooldown 15s)",
+					ChatColor.LIGHT_PURPLE + "- Can Shoot Magic (Cooldown 2s)" },
+			Games.CLASH_ROYALE, false);
 
 	private String display;
 	private Material material;
