@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import net.herobrine.clashroyale.classes.*;
 import net.herobrine.core.LevelRewards;
 import net.herobrine.wallsg.*;
 import net.herobrine.wallsg.game.*;
@@ -37,15 +38,9 @@ import com.google.common.collect.TreeMultimap;
 
 import net.herobrine.blockhunt.BlockHuntGame;
 import net.herobrine.blockhunt.ModifiedTypes;
-import net.herobrine.clashroyale.Archer;
-import net.herobrine.clashroyale.Bandit;
-import net.herobrine.clashroyale.BattleHealer;
+
 import net.herobrine.clashroyale.ClashRoyaleGame;
-import net.herobrine.clashroyale.Fisherman;
-import net.herobrine.clashroyale.Knight;
-import net.herobrine.clashroyale.Lumberjack;
-import net.herobrine.clashroyale.Witch;
-import net.herobrine.clashroyale.Wizard;
+
 import net.herobrine.core.HerobrinePVPCore;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
@@ -64,6 +59,8 @@ public class Arena {
 	private BlockHuntGame blockHuntGame;
 	private ClashRoyaleGame clashRoyaleGame;
 	private Game wallsSGGame;
+
+	//private GameClass workshopGame;
 	private boolean canJoin;
 
 	public void freezeEntity(Entity en) {
@@ -140,11 +137,19 @@ public class Arena {
 			wallsSGGame = new Game(this);
 		}
 
+
+		else if (getGame(id).equals(Games.WORKSHOP)) {
+			setType(GameType.VANILLA);
+			//workshopGame = new GameClass(this);
+		}
+
 		else {
 			System.out.println("[GAME CORE] URGENT ERROR! UNABLE TO INITIALIZE ARENA: " + id
 					+ "\nReason: Unable to determine the game type");
 
 		}
+
+
 
 		canJoin = true;
 
@@ -845,7 +850,9 @@ public class Arena {
 			case LUMBERJACK:
 				classes.put(uuid, new Lumberjack(uuid));
 				break;
-
+			case MONK:
+				classes.put(uuid, new Monk(uuid));
+				break;
 			case MINER:
 				classes.put(uuid, new Miner(uuid));
 			break;

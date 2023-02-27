@@ -14,7 +14,9 @@ public enum Games {
 	CLASH_ROYALE(ChatColor.AQUA + "Battle Clash", "bc", ChatColor.AQUA, true, true, false, false, true, 2, 35, 100, 15, 50, true, Material.DIAMOND_SWORD, new String[] {"wins", "kills", "roundsPlayed"}, new String[] {"Wins", "Kills", "Rounds Played"}, false),
 	WALLS_SG(ChatColor.YELLOW + "Walls SG", "wsg", ChatColor.YELLOW, true, true, true, false, false, 4, 50, 100, 20, 60, true, Material.DIAMOND_AXE, new String[] {"wins", "kills", "roundsPlayed"}, new String[] {"Wins", "Kills", "Rounds Played"}, false),
 	CLASH_MINI(ChatColor.GOLD + "Clash Mini", "cm", ChatColor.GOLD, false, false, false, false, false, 0, 60, 120, 25, 65, false, Material.NETHER_STAR, null, null, false),
-	DELTARUNE(ChatColor.RED + "Delta Craft", "dc", ChatColor.RED, false, false, false, false, false, 0, 100, 1000, 100, 1000, false, Material.EYE_OF_ENDER, null, null, false);
+	DELTARUNE(ChatColor.RED + "Delta Craft", "dc", ChatColor.RED, false, false, false, false, false, 0, 100, 1000, 100, 1000, false, Material.EYE_OF_ENDER, null, null, false),
+	WORKSHOP(ChatColor.BLUE + "Workshop", "tc", ChatColor.BLUE, false, false, false, false ,false,
+	0,50, 300, 30, 50, false, Material.WORKBENCH, null, null, false);
 
 	private String display;
 	private String key;
