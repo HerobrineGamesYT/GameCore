@@ -166,4 +166,5 @@ public class GameCoreMain extends JavaPlugin {
 
 		((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(packet);
 	}
+
 }

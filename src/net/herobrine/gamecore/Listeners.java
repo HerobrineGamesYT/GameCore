@@ -3,6 +3,7 @@ package net.herobrine.gamecore;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -69,6 +70,7 @@ public class Listeners implements Listener {
 	public void onClick(InventoryClickEvent e) {
 		Player player = (Player) e.getWhoClicked();
 		if (Manager.isPlaying(player)) {
+
 
 			if (Manager.getArena(player).getSpectators().contains(player.getUniqueId())) {
 

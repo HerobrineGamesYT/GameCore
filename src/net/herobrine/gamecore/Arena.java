@@ -6,8 +6,8 @@ import java.util.*;
 
 import net.herobrine.clashroyale.classes.*;
 import net.herobrine.core.LevelRewards;
+import net.herobrine.deltacraft.game.DeltaGame;
 import net.herobrine.wallsg.*;
-import net.herobrine.wallsg.game.*;
 import net.herobrine.wallsg.classes.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -59,6 +59,8 @@ public class Arena {
 	private BlockHuntGame blockHuntGame;
 	private ClashRoyaleGame clashRoyaleGame;
 	private Game wallsSGGame;
+
+	private DeltaGame deltaGame;
 
 	//private GameClass workshopGame;
 	private boolean canJoin;
@@ -137,6 +139,11 @@ public class Arena {
 			wallsSGGame = new Game(this);
 		}
 
+		else if (getGame(id).equals(Games.DELTARUNE)) {
+			 deltaGame = new DeltaGame(this);
+			 setType((Config.getGameMod(id)));
+		}
+
 
 		else if (getGame(id).equals(Games.WORKSHOP)) {
 			setType(GameType.VANILLA);
@@ -189,6 +196,10 @@ public class Arena {
 		} else if (getGame(id).equals(Games.WALLS_SG)) {
 			setType(type);
 			wallsSGGame.start();
+		}
+
+		else if (getGame(id).equals(Games.DELTARUNE)) {
+			deltaGame.startMission(getType());
 		}
 
 		else {
@@ -679,6 +690,8 @@ public class Arena {
 		return clashRoyaleGame;
 	}
 
+	public DeltaGame getDeltaGame() { return deltaGame;}
+
 	public void removeClass(UUID uuid) {
 		if (classes.containsKey(uuid)) {
 
@@ -819,6 +832,10 @@ public class Arena {
 
 	public void setClass(UUID uuid, ClassTypes type) {
 		removeClass(uuid);
+
+		if (type.isDisabled()) {
+			
+		}
 		switch (type) {
 			case BANDIT:
 				classes.put(uuid, new Bandit(uuid));

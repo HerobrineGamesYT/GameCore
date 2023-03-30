@@ -41,7 +41,7 @@ public class ItemBuilder {
 
 	public ItemBuilder setGlow(boolean glow) {
 		if (glow) {
-			addEnchant(Enchantment.KNOCKBACK, 1);
+			addEnchant(Enchantment.DURABILITY, 1);
 			addItemFlag(ItemFlag.HIDE_ENCHANTS);
 		} else {
 			ItemMeta meta = getItemMeta();
