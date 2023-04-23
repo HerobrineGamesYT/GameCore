@@ -94,7 +94,20 @@ public class ArenaCommand implements CommandExecutor {
 											ChatColor.AQUA + "Game Status: " + ChatColor.YELLOW + "RECRUITING");
 									player.sendMessage(ChatColor.AQUA + "Player Count: " + ChatColor.AQUA
 											+ arena.getPlayers().size() + "/" + Config.getMaxPlayers(arenaID));
-								} else {
+								}
+
+								else if (arena.getState().equals(GameState.LIVE_ENDING)) {
+									player.sendMessage(ChatColor.AQUA + "Arena ID: " + arena.getID());
+									player.sendMessage(
+											ChatColor.AQUA + "Game Type: " + arena.getGame(arena.getID()).getDisplay());
+									player.sendMessage(
+											ChatColor.AQUA + "Game Status: " + ChatColor.GREEN + "LIVE_ENDING");
+									player.sendMessage(ChatColor.AQUA + "Instance Type: " + arena.getType());
+									player.sendMessage(ChatColor.AQUA + "Player Count: " + ChatColor.AQUA
+											+ arena.getPlayers().size() + "/" + Config.getMaxPlayers(arenaID));
+								}
+
+								else {
 									player.sendMessage(ChatColor.AQUA + "Arena ID: " + arena.getID());
 									player.sendMessage(
 											ChatColor.AQUA + "Game Type: " + arena.getGame(arena.getID()).getDisplay());

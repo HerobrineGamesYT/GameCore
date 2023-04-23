@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="C:/Users/paulm/Desktop/Herobrine PVP Test Server/plugins/HBPVP-Core.jar"/>
 	<classpathentry kind="lib" path="C:/Users/paulm/Desktop/Herobrine PVP Test Server/plugins/BlockHunt.jar"/>
 	<classpathentry kind="lib" path="C:/Users/paulm/Desktop/Herobrine PVP Test Server/plugins/ClashRoyale.jar"/>
+	<classpathentry kind="lib" path="C:/Users/paulm/Desktop/Herobrine PVP Test Server/plugins/WallsSG.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

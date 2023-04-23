@@ -6,7 +6,7 @@ import java.util.List;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import net.herobrine.wallsg.ModifiedTypes;
+import net.herobrine.blockhunt.ModifiedTypes;
 
 public class Manager {
 

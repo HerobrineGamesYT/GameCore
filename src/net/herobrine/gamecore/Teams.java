@@ -3,9 +3,8 @@ package net.herobrine.gamecore;
 import org.bukkit.ChatColor;
 
 public enum Teams {
-	RED(ChatColor.RED + "RED", ChatColor.RED), BLUE(ChatColor.BLUE + "BLUE", ChatColor.BLUE);
-	// GREEN(ChatColor.GREEN + "GREEN", ChatColor.GREEN), YELLOW(ChatColor.YELLOW +
-	// "YELLOW", ChatColor.YELLOW);
+	RED(ChatColor.RED + "RED", ChatColor.RED), BLUE(ChatColor.BLUE + "BLUE", ChatColor.BLUE),
+	GREEN(ChatColor.GREEN + "GREEN", ChatColor.GREEN), YELLOW(ChatColor.YELLOW + "YELLOW", ChatColor.YELLOW), PLACEHOLDER(ChatColor.WHITE + "PLACEHOLDER", ChatColor.WHITE);
 
 	private String display;
 	private ChatColor color;

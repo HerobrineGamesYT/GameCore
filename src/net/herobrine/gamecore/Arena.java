@@ -2,11 +2,13 @@ package net.herobrine.gamecore;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import net.herobrine.clashroyale.classes.*;
+import net.herobrine.core.LevelRewards;
+import net.herobrine.deltacraft.game.DeltaGame;
+import net.herobrine.wallsg.*;
+import net.herobrine.wallsg.classes.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -23,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -33,16 +36,12 @@ import org.bukkit.scoreboard.Team;
 
 import com.google.common.collect.TreeMultimap;
 
-import net.herobrine.clashroyale.Archer;
-import net.herobrine.clashroyale.Bandit;
-import net.herobrine.clashroyale.BattleHealer;
+import net.herobrine.blockhunt.BlockHuntGame;
+import net.herobrine.blockhunt.ModifiedTypes;
+
 import net.herobrine.clashroyale.ClashRoyaleGame;
-import net.herobrine.clashroyale.Knight;
-import net.herobrine.clashroyale.Witch;
-import net.herobrine.clashroyale.Wizard;
+
 import net.herobrine.core.HerobrinePVPCore;
-import net.herobrine.wallsg.BlockHuntGame;
-import net.herobrine.wallsg.ModifiedTypes;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
@@ -59,6 +58,11 @@ public class Arena {
 	private Countdown countdown;
 	private BlockHuntGame blockHuntGame;
 	private ClashRoyaleGame clashRoyaleGame;
+	private Game wallsSGGame;
+
+	private DeltaGame deltaGame;
+
+	//private GameClass workshopGame;
 	private boolean canJoin;
 
 	public void freezeEntity(Entity en) {
@@ -76,8 +80,12 @@ public class Arena {
 		teams = new HashMap<>();
 		classes = new HashMap<>();
 		type = GameType.VANILLA;
-		spawn = Config.getArenaSpawn(id);
-		spawn.getWorld().setGameRuleValue("keepInventory", "true");
+		spawn = net.herobrine.gamecore.Config.getArenaSpawn(id);
+
+		if (!getGame(id).equals(Games.WALLS_SG)) {
+			spawn.getWorld().setGameRuleValue("keepInventory", "true");
+		}
+
 		state = GameState.RECRUITING;
 		countdown = new Countdown(this);
 		spectators = new ArrayList<>();
@@ -105,7 +113,41 @@ public class Arena {
 		else if (getGame(id).equals(Games.BEDWARS)) {
 			// game = new BedwarsGame(this);
 		} else if (getGame(id).equals(Games.CLASH_ROYALE)) {
-			clashRoyaleGame = new ClashRoyaleGame(this);
+
+			if (GameCoreMain.getInstance().getConfig().getString("arenas." + id + ".game-mod") != null) {
+				if (GameType.valueOf(GameCoreMain.getInstance().getConfig().getString("arenas." + id + ".game-mod"))
+						.equals(GameType.CLASH_ROYALE)) {
+
+					setType(GameType.CLASH_ROYALE);
+					clashRoyaleGame = new ClashRoyaleGame(this, true);
+				} else {
+
+					clashRoyaleGame = new ClashRoyaleGame(this, false);
+				}
+			}
+
+			else {
+
+				clashRoyaleGame = new ClashRoyaleGame(this, false);
+			}
+
+		}
+
+		else if (getGame(id).equals(Games.WALLS_SG)) {
+
+			setType(GameType.VANILLA);
+			wallsSGGame = new Game(this);
+		}
+
+		else if (getGame(id).equals(Games.DELTARUNE)) {
+			 deltaGame = new DeltaGame(this);
+			 setType((Config.getGameMod(id)));
+		}
+
+
+		else if (getGame(id).equals(Games.WORKSHOP)) {
+			setType(GameType.VANILLA);
+			//workshopGame = new GameClass(this);
 		}
 
 		else {
@@ -113,7 +155,11 @@ public class Arena {
 					+ "\nReason: Unable to determine the game type");
 
 		}
+
+
+
 		canJoin = true;
+
 
 	}
 
@@ -134,7 +180,26 @@ public class Arena {
 		else if (getGame(id).equals(Games.BEDWARS)) {
 			// bedwarsGame.start
 		} else if (getGame(id).equals(Games.CLASH_ROYALE)) {
-			clashRoyaleGame.start();
+
+			if (Config.getGameMod(id) != null) {
+
+				if (Config.getGameMod(id).equals(GameType.CLASH_ROYALE)) {
+					setType(GameType.CLASH_ROYALE);
+					clashRoyaleGame.start(GameType.CLASH_ROYALE);
+				}
+
+			} else {
+				setType(type);
+				clashRoyaleGame.start(GameType.VANILLA);
+			}
+
+		} else if (getGame(id).equals(Games.WALLS_SG)) {
+			setType(type);
+			wallsSGGame.start();
+		}
+
+		else if (getGame(id).equals(Games.DELTARUNE)) {
+			deltaGame.startMission(getType());
 		}
 
 		else {
@@ -145,6 +210,7 @@ public class Arena {
 	}
 
 	public void reset() {
+
 
 		for (UUID uuid : players) {
 			removeClass(uuid);
@@ -170,13 +236,34 @@ public class Arena {
 			ItemMeta selectorMeta = gameSelector.getItemMeta();
 			selectorMeta.setDisplayName(ChatColor.GREEN + "Game Selector");
 			gameSelector.setItemMeta(selectorMeta);
+			ItemBuilder shop = new ItemBuilder(Material.EMERALD);
+			shop.setDisplayName(ChatColor.AQUA + "Shop " + ChatColor.GRAY + "(Right Click)");
+
+			ItemBuilder cosmetics = new ItemBuilder(Material.CHEST);
+
+			cosmetics.setDisplayName(ChatColor.AQUA + "Cosmetics " + ChatColor.GRAY + "(Coming Soon)");
+
+			ItemStack profile = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+			SkullMeta profileMeta = (SkullMeta) profile.getItemMeta();
+
+			profileMeta.setOwner(player.getName());
+			profileMeta.setDisplayName(ChatColor.GREEN + "My Profile " + ChatColor.GRAY + "(Right Click)");
+			profile.setItemMeta(profileMeta);
+
+			player.setHealth(20.0);
+			player.setGameMode(GameMode.SURVIVAL);
+
 			for (Player players : Bukkit.getOnlinePlayers()) {
 				players.showPlayer(player);
 			}
 
 			HerobrinePVPCore.buildSidebar(player);
-			player.teleport(Config.getLobbySpawn());
+			player.teleport(net.herobrine.gamecore.Config.getLobbySpawn());
+
 			player.getInventory().setItem(0, gameSelector);
+			player.getInventory().setItem(1, profile);
+			player.getInventory().setItem(3, shop.build());
+			player.getInventory().setItem(4, cosmetics.build());
 
 			if (getGame(id).requiresNewWorld()) {
 				player.sendMessage(
@@ -184,7 +271,11 @@ public class Arena {
 			}
 
 		}
-		type = GameType.VANILLA;
+
+		if (!getType().equals(GameType.CLASH_ROYALE) && !getGame(id).equals(Games.DELTARUNE)) {
+			type = GameType.VANILLA;
+		}
+
 		state = GameState.RECRUITING;
 		players.clear();
 		teams.clear();
@@ -214,36 +305,46 @@ public class Arena {
 				Bukkit.getWorld("bhMap" + id).setGameRuleValue("keepInventory", "true");
 			}
 
-			System.gc();
 			// blockHuntGame = new BlockHuntGame(this);
 			// is deprecated in favor of the new localized runnable system in each game
 			// class
 		}
 
 		else if (getGame(id).equals(Games.CLASH_ROYALE)) {
-			for (Entity ent : Config.getGameWorld(id).getEntities()) {
-				ent.remove();
-			}
+			for (Entity ent : net.herobrine.gamecore.Config.getGameWorld(id).getEntities()) {if (!(ent instanceof Player)) ent.remove();}
+			getBattleClash().kills.clear();
 		}
 
 		else if (getGame(id).equals(Games.MLG_RUSH)) {
-			System.gc();
+
 			// game = new MLGRushGame(this);
 		}
 
 		else if (getGame(id).equals(Games.SKYWARS)) {
-			System.gc();
+
 			// game = new SkywarsGame(this);
 		}
 
 		else if (getGame(id).equals(Games.BEDWARS)) {
-			System.gc();
+
 			// game = new BedwarsGame(this);
+		}
+
+		else if (getGame(id).equals(Games.WALLS_SG)) {
+			Game.resetChests();
+			wallsSGGame.resetBlocks();
+
+			for (Entity ent : net.herobrine.gamecore.Config.getGameWorld(id).getEntities()) {if (!(ent instanceof Player)) ent.remove();}
+
+			Game.getAlivePlayers().clear();
+			Game.kills.clear();
+			getwallsSGGame().getCustomDeathCause().clear();
+
 		}
 
 		countdown = new Countdown(this);
 
-		spawn = Config.getArenaSpawn(id);
+		spawn = net.herobrine.gamecore.Config.getArenaSpawn(id);
 		System.gc();
 		canJoin = true;
 	}
@@ -252,7 +353,7 @@ public class Arena {
 		state = GameState.RECRUITING;
 		countdown = new Countdown(this);
 		canJoin = true;
-		spawn = Config.getArenaSpawn(id);
+		spawn = net.herobrine.gamecore.Config.getArenaSpawn(id);
 	}
 
 	public void sendMessage(String message) {
@@ -287,7 +388,7 @@ public class Arena {
 	public void playEndSounds(Teams team, Sound sound, Sound sound2) {
 		for (UUID uuid : players) {
 			Player player = Bukkit.getPlayer(uuid);
-			if (getTeam(player).equals(team)) {
+			if (getTeam(player).equals(team) && !getSpectators().contains(player.getUniqueId())) {
 				player.playSound(player.getLocation(), sound, 1f, 1f);
 			} else {
 				player.playSound(player.getLocation(), sound2, 1f, 1f);
@@ -295,11 +396,19 @@ public class Arena {
 		}
 	}
 
+	public void setCanJoin(boolean set) {
+		canJoin = set;
+
+	}
+
 	public void addPlayer(Player player) {
 		players.add(player.getUniqueId());
 		if (player.getAllowFlight()) {
 			player.setAllowFlight(false);
 		}
+
+		player.setLevel(0);
+		player.setExp(0F);
 		player.teleport(spawn);
 		clearInventory(player);
 		ItemStack leaveItem = new ItemStack(Material.REDSTONE);
@@ -352,8 +461,16 @@ public class Arena {
 
 		if (getGame(id).isTeamGame()) {
 			TreeMultimap<Integer, Teams> count = TreeMultimap.create();
+			int i = 1;
 			for (Teams team : Teams.values()) {
-				count.put(getTeamCount(team), team);
+
+				if (i > getGame(id).getTeamCount()) {
+					break;
+				} else {
+					count.put(getTeamCount(team), team);
+				}
+
+				i++;
 			}
 			Teams selected = (Teams) count.values().toArray()[0];
 			setTeam(player, selected);
@@ -373,7 +490,6 @@ public class Arena {
 			team.setPrefix(ChatColor.AQUA + "Team: ");
 			team.setSuffix(selected.getDisplay());
 			obj.getScore(ChatColor.RED.toString()).setScore(4);
-			;
 
 			Score blank2 = obj.getScore("  ");
 			blank2.setScore(3);
@@ -381,7 +497,7 @@ public class Arena {
 			playerCount.addEntry(ChatColor.BLACK.toString());
 			playerCount.setPrefix("Players: ");
 			playerCount.setSuffix(ChatColor.translateAlternateColorCodes('&', "&a") + players.size() + ChatColor.GREEN
-					+ "/" + Config.getMaxPlayers(id));
+					+ "/" + net.herobrine.gamecore.Config.getMaxPlayers(id));
 			obj.getScore(ChatColor.BLACK.toString()).setScore(2);
 			Score ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cherobrinepvp.beastmc.com"));
 			ip.setScore(1);
@@ -404,7 +520,7 @@ public class Arena {
 			playerCount.addEntry(ChatColor.BLACK.toString());
 			playerCount.setPrefix("Players: ");
 			playerCount.setSuffix(ChatColor.translateAlternateColorCodes('&', "&a") + players.size() + ChatColor.GREEN
-					+ "/" + Config.getMaxPlayers(id));
+					+ "/" + net.herobrine.gamecore.Config.getMaxPlayers(id));
 			obj.getScore(ChatColor.BLACK.toString()).setScore(4);
 			Score ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cherobrinepvp.beastmc.com"));
 			ip.setScore(1);
@@ -417,22 +533,61 @@ public class Arena {
 			Bukkit.getPlayer(uuid)
 					.sendMessage(HerobrinePVPCore.getFileManager().getRank(player).getColor() + player.getName()
 							+ ChatColor.YELLOW + " has joined (" + ChatColor.AQUA + players.size() + ChatColor.YELLOW
-							+ "/" + ChatColor.AQUA + Config.getMaxPlayers(id) + ChatColor.YELLOW + ")!");
+							+ "/" + ChatColor.AQUA + net.herobrine.gamecore.Config.getMaxPlayers(id) + ChatColor.YELLOW
+							+ ")!");
 
 			player2.getScoreboard().getTeam("player_count").setSuffix(ChatColor.translateAlternateColorCodes('&', "&a")
-					+ players.size() + ChatColor.GREEN + "/" + Config.getMaxPlayers(id));
+					+ players.size() + ChatColor.GREEN + "/" + net.herobrine.gamecore.Config.getMaxPlayers(id));
 
 		}
-		if (players.size() >= Config.getRequiredPlayers(id) && !getState().equals(GameState.COUNTDOWN)) {
+		if (players.size() >= net.herobrine.gamecore.Config.getRequiredPlayers(id)
+				&& !getState().equals(GameState.COUNTDOWN)) {
 			countdown.begin();
 		}
 
+		System.gc();
 	}
 
 	public void removePlayer(Player player) {
 		players.remove(player.getUniqueId());
+		if (getGame(id).equals(Games.WALLS_SG) && getState().equals(GameState.LIVE)) {
+
+			Game game = getwallsSGGame();
+			if (Game.getAlivePlayers().contains(player.getUniqueId())) {
+
+				Game.getAlivePlayers().remove(player.getUniqueId());
+				if (Game.alivePlayers1.containsKey(player.getUniqueId())) {
+
+					Game.alivePlayers1.remove(player.getUniqueId());
+
+					if (getTeam(player).equals(Teams.RED)) {
+
+						game.aliveRedPlayers = game.aliveRedPlayers - 1;
+					}
+
+					else if (getTeam(player).equals(Teams.BLUE)) {
+
+						game.aliveBluePlayers = game.aliveBluePlayers - 1;
+					}
+
+					else if (getTeam(player).equals(Teams.YELLOW)) {
+
+						game.aliveYellowPlayers = game.aliveYellowPlayers - 1;
+					}
+
+					else if (getTeam(player).equals(Teams.GREEN)) {
+
+						game.aliveGreenPlayers = game.aliveGreenPlayers - 1;
+
+					}
+				}
+			}
+		}
+
 		removeTeam(player);
 		removeClass(player.getUniqueId());
+		removeSpectator(player);
+
 		if (getState() != GameState.LIVE) {
 			for (UUID uuid : players) {
 				Player player2 = Bukkit.getPlayer(uuid);
@@ -440,22 +595,73 @@ public class Arena {
 
 					player2.getScoreboard().getTeam("player_count")
 							.setSuffix(ChatColor.translateAlternateColorCodes('&', "&a") + players.size()
-									+ ChatColor.GREEN + "/" + Config.getMaxPlayers(id));
+									+ ChatColor.GREEN + "/" + net.herobrine.gamecore.Config.getMaxPlayers(id));
 				} else {
 					break;
 				}
 
 			}
 		}
-		// if (Game.getAlivePlayers().contains(player.getUniqueId())) {
-		// Game.getAlivePlayers().remove(player.getUniqueId());
-		// }
+
 		if (player.isOnline()) {
 			player.setDisplayName(player.getName());
-			player.teleport(Config.getLobbySpawn());
+			player.getEquipment().setHelmet(null);
+			player.getEquipment().setChestplate(null);
+			player.getEquipment().setLeggings(null);
+			player.getEquipment().setBoots(null);
+			player.setExp(0.0F);
+			player.setLevel(0);
+			player.getInventory().clear();
+			player.setHealth(20.0);
+			player.getEnderChest().clear();
+			ItemStack gameSelector = new ItemStack(Material.COMPASS, 1);
+			ItemMeta selectorMeta = gameSelector.getItemMeta();
+			selectorMeta.setDisplayName(ChatColor.GREEN + "Game Selector");
+			gameSelector.setItemMeta(selectorMeta);
+			ItemBuilder shop = new ItemBuilder(Material.EMERALD);
+			shop.setDisplayName(ChatColor.AQUA + "Shop " + ChatColor.GRAY + "(Right Click)");
+
+			ItemBuilder cosmetics = new ItemBuilder(Material.CHEST);
+
+			cosmetics.setDisplayName(ChatColor.AQUA + "Cosmetics " + ChatColor.GRAY + "(Coming Soon)");
+
+			ItemStack profile = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+			SkullMeta profileMeta = (SkullMeta) profile.getItemMeta();
+
+			profileMeta.setOwner(player.getName());
+			profileMeta.setDisplayName(ChatColor.GREEN + "My Profile " + ChatColor.GRAY + "(Right Click)");
+			profile.setItemMeta(profileMeta);
+
+			player.teleport(net.herobrine.gamecore.Config.getLobbySpawn());
+
+			player.getInventory().setItem(0, gameSelector);
+			player.getInventory().setItem(1, profile);
+			player.getInventory().setItem(3, shop.build());
+			player.getInventory().setItem(4, cosmetics.build());
+
+			player.setLevel(HerobrinePVPCore.getFileManager().getPlayerLevel(player.getUniqueId()));
+			player.setExp(HerobrinePVPCore.getFileManager().getPlayerXP(player.getUniqueId())
+					/ HerobrinePVPCore.getFileManager().getMaxXP(player.getUniqueId()));
+
 			HerobrinePVPCore.buildSidebar(player);
 		} else {
 			return;
+		}
+
+		if (getState() != GameState.LIVE) {
+			System.gc();
+		}
+
+		if (getState() == GameState.LIVE) {
+
+			if (getPlayers().size() <= 1) {
+				if (getPlayers().size() != 0) {
+					sendMessage(ChatColor.RED + "The other players left, so the game has ended.");
+
+				}
+				reset();
+			}
+
 		}
 
 	}
@@ -480,40 +686,208 @@ public class Arena {
 		return state;
 	}
 
+	public ClashRoyaleGame getBattleClash() {
+		return clashRoyaleGame;
+	}
+
+	public DeltaGame getDeltaGame() { return deltaGame;}
+
 	public void removeClass(UUID uuid) {
 		if (classes.containsKey(uuid)) {
+
+			if (getGame(id).equals(Games.WALLS_SG) && getType().equals(GameType.MODIFIER)) {
+				if (getClass(uuid).equals(ClassTypes.ENGINEER)) {
+					Engineer engineer = (Engineer) getClasses().get(uuid);
+					engineer.undoSession(this);
+				}
+			}
+
 			classes.get(uuid).remove();
 			classes.remove(uuid);
 		}
 	}
 
+	public void distributeRewards(Teams winner) {
+
+		System.out.println("Giving rewards to: " + winner.getDisplay());
+
+		for (UUID uuid: players) {
+
+			Player player = Bukkit.getPlayer(uuid);
+
+			if (getTeam(player) == winner) {
+
+				LevelRewards prestige = HerobrinePVPCore.getFileManager().getPrestige(HerobrinePVPCore.getFileManager().getPlayerLevel(uuid));
+				int earnedCoins = (int)Math.round(prestige.getGameCoinMultiplier() *  getGame(id).getBaseWinCoins());
+
+				int earnedXP = (int) Math.round(prestige.getBaseXPBoost() * getGame(id).getBaseWinXP());
+
+				HerobrinePVPCore.getFileManager().addCoins(player, earnedCoins);
+ 				HerobrinePVPCore.getFileManager().addTrophies(player, 1);
+
+				 player.sendMessage(ChatColor.GOLD + "+1 Trophy! (Win)");
+				 player.sendMessage(ChatColor.YELLOW + "+" + earnedCoins + " Coins! (Win)");
+
+				if (HerobrinePVPCore.getFileManager().getPlayerLevel(player.getUniqueId()) < 100) {
+
+					HerobrinePVPCore.getFileManager().addPlayerXP(uuid, earnedXP);
+					player.sendMessage(ChatColor.AQUA + "+" + earnedXP + " XP! (Win)");
+				}
+				else {
+					HerobrinePVPCore.getFileManager().addCoins(player, 100);
+					player.sendMessage(ChatColor.YELLOW + "+100 Coins! (Max Level Bonus)");
+
+				}
+
+			}
+			else {
+				LevelRewards prestige = HerobrinePVPCore.getFileManager().getPrestige(HerobrinePVPCore.getFileManager().getPlayerLevel(uuid));
+				int earnedCoins = (int)Math.round(prestige.getGameCoinMultiplier() *  getGame(id).getBaseCoins());
+
+				int earnedXP = (int) Math.round(prestige.getBaseXPBoost() * getGame(id).getBaseXP());
+
+				HerobrinePVPCore.getFileManager().addCoins(player, earnedCoins);
+
+
+				player.sendMessage(ChatColor.YELLOW + "+" + earnedCoins + " Coins! (Playing)");
+
+				if (HerobrinePVPCore.getFileManager().getPlayerLevel(player.getUniqueId()) < 100) {
+
+					HerobrinePVPCore.getFileManager().addPlayerXP(uuid, earnedXP);
+					player.sendMessage(ChatColor.AQUA + "+" + earnedXP + " XP! (Playing)");
+				}
+				else {
+					HerobrinePVPCore.getFileManager().addCoins(player, 100);
+					player.sendMessage(ChatColor.YELLOW + "+100 Coins! (Max Level Bonus)");
+
+				}
+			}
+
+		}
+
+
+
+
+	}
+
+	public void distributeRewards(UUID winner) {
+
+		for (UUID uuid: players) {
+
+			Player player = Bukkit.getPlayer(uuid);
+
+			if (uuid == winner) {
+
+				LevelRewards prestige = HerobrinePVPCore.getFileManager().getPrestige(HerobrinePVPCore.getFileManager().getPlayerLevel(uuid));
+				int earnedCoins = (int)Math.round(prestige.getGameCoinMultiplier() *  getGame(id).getBaseWinCoins());
+
+				int earnedXP = (int) Math.round(prestige.getBaseXPBoost() * getGame(id).getBaseWinXP());
+
+				HerobrinePVPCore.getFileManager().addCoins(player, earnedCoins);
+
+
+				player.sendMessage(ChatColor.YELLOW + "+" + earnedCoins + " coins! (Win)");
+
+				if (HerobrinePVPCore.getFileManager().getPlayerLevel(player.getUniqueId()) < 100) {
+					player.sendMessage(ChatColor.AQUA + "+" + earnedXP + " XP! (Win)");
+					HerobrinePVPCore.getFileManager().addPlayerXP(uuid, earnedXP);
+
+				}
+				else {
+					HerobrinePVPCore.getFileManager().addCoins(player, 100);
+					player.sendMessage(ChatColor.YELLOW + "+100 Coins! (Max Level Bonus)");
+
+				}
+
+			}
+			else {
+				LevelRewards prestige = HerobrinePVPCore.getFileManager().getPrestige(HerobrinePVPCore.getFileManager().getPlayerLevel(uuid));
+				int earnedCoins = (int)Math.round(prestige.getGameCoinMultiplier() *  getGame(id).getBaseCoins());
+
+				int earnedXP = (int) Math.round(prestige.getBaseXPBoost() * getGame(id).getBaseXP());
+
+				HerobrinePVPCore.getFileManager().addCoins(player, earnedCoins);
+				player.sendMessage(ChatColor.YELLOW + "+" + earnedCoins + " coins! (Playing)");
+				if (HerobrinePVPCore.getFileManager().getPlayerLevel(player.getUniqueId()) < 100) {
+
+					HerobrinePVPCore.getFileManager().addPlayerXP(uuid, earnedXP);
+					player.sendMessage(ChatColor.AQUA + "+" + earnedXP + " XP! (Playing)");
+				}
+				else {
+					HerobrinePVPCore.getFileManager().addCoins(player, 100);
+					player.sendMessage(ChatColor.YELLOW + "+100 Coins! (Max Level Bonus)");
+
+				}
+
+
+
+
+			}
+
+		}
+
+
+
+	}
+
 	public void setClass(UUID uuid, ClassTypes type) {
 		removeClass(uuid);
+
+		if (type.isDisabled()) {
+			
+		}
 		switch (type) {
-		case BANDIT:
-			classes.put(uuid, new Bandit(uuid));
-			break;
+			case BANDIT:
+				classes.put(uuid, new Bandit(uuid));
+				break;
 
-		case WIZARD:
-			classes.put(uuid, new Wizard(uuid));
-			break;
-		case KNIGHT:
-			classes.put(uuid, new Knight(uuid));
-			break;
+			case WIZARD:
+				classes.put(uuid, new Wizard(uuid));
+				break;
+			case KNIGHT:
+				classes.put(uuid, new Knight(uuid));
+				break;
 
-		case ARCHER:
-			classes.put(uuid, new Archer(uuid));
-			break;
+			case ARCHER:
+				classes.put(uuid, new Archer(uuid));
+				break;
 
-		case HEALER:
-			classes.put(uuid, new BattleHealer(uuid));
-			break;
+			case HEALER:
+				classes.put(uuid, new BattleHealer(uuid));
+				break;
 
-		case WITCH:
-			classes.put(uuid, new Witch(uuid));
+			case WITCH:
+				classes.put(uuid, new Witch(uuid));
+				break;
+
+			case FISHERMAN:
+				classes.put(uuid, new Fisherman(uuid));
+				break;
+
+			case LUMBERJACK:
+				classes.put(uuid, new Lumberjack(uuid));
+				break;
+			case MONK:
+				classes.put(uuid, new Monk(uuid));
+				break;
+			case MINER:
+				classes.put(uuid, new Miner(uuid));
 			break;
-		default:
-			break;
+			case ENGINEER:
+				classes.put(uuid, new Engineer(uuid));
+				break;
+			case ECONOMIST:
+				classes.put(uuid, new Economist(uuid));
+				break;
+
+			case JUGGERNAUT:
+
+				classes.put(uuid, new Juggernaut(uuid));
+				break;
+
+
+				default:
+				break;
 		}
 	}
 
@@ -568,7 +942,12 @@ public class Arena {
 		return amount;
 	}
 
+	public Game getwallsSGGame() {
+		return wallsSGGame;
+	}
+
 	public void setSpectator(Player player) {
+
 		ItemStack spectate = new ItemStack(Material.COMPASS, 1);
 		ItemMeta spectateMeta = spectate.getItemMeta();
 		spectateMeta.setDisplayName(ChatColor.GREEN + "Spectate");
@@ -586,6 +965,34 @@ public class Arena {
 		player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999999, 3));
 		player.addPotionEffect(PotionEffectType.INVISIBILITY.createEffect(99999999, 3));
 	}
+
+	public void addAsSpectator(Player player, boolean isStaff, boolean canParticipate) {
+		for (UUID uuid : players) {
+			Player player2 = Bukkit.getPlayer(uuid);
+			player2.hidePlayer(player);
+		}
+		Random rand = new Random();
+		int randIndex = rand.nextInt(players.size());
+		Player playerRandom = Bukkit.getPlayer(players.get(randIndex));
+		players.add(player.getUniqueId());
+		player.teleport(playerRandom);
+	 	setSpectator(player);
+
+		 if (!isStaff) sendMessage(HerobrinePVPCore.getFileManager().getRank(player).getColor() + player.getName() + ChatColor.AQUA + " joined as a spectator.");
+	}
+
+	public void addAsSpectator(Player player, Player playerToSpectate, boolean isStaff, boolean canParticipate) {
+		for (UUID uuid : players) {
+			Player player2 = Bukkit.getPlayer(uuid);
+			player2.hidePlayer(player);
+		}
+
+		player.teleport(playerToSpectate);
+		players.add(player.getUniqueId());
+		setSpectator(player);
+		if (!isStaff) sendMessage(HerobrinePVPCore.getFileManager().getRank(player).getColor() + player.getName() + ChatColor.AQUA + " joined as a spectator.");
+	}
+
 
 	public void removeSpectator(Player player) {
 
@@ -652,7 +1059,7 @@ public class Arena {
 
 	public Games getGame(int id) {
 
-		String arenaKey = Config.getGameType(id);
+		String arenaKey = net.herobrine.gamecore.Config.getGameType(id);
 		for (Games game : Games.values()) {
 			if (game.getKey().equals(arenaKey)) {
 
@@ -711,5 +1118,12 @@ public class Arena {
 			GameCoreMain.getInstance().sendTitle(player, title, subtitle, fadeIn, stay, fadeOut);
 		}
 
+	}
+
+	public void sendActionBar(String text) {
+		for (UUID uuid: players) {
+			Player player = Bukkit.getPlayer(uuid);
+			GameCoreMain.getInstance().sendActionBar(player, text);
+		}
 	}
 }

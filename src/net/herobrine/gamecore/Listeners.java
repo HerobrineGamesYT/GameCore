@@ -1,11 +1,9 @@
 package net.herobrine.gamecore;
 
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,16 +13,10 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
-
-import net.herobrine.core.HerobrinePVPCore;
 
 public class Listeners implements Listener {
 
 	@EventHandler
-
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().teleport(Config.getLobbySpawn());
 		e.getPlayer().setExp(0.0F);
@@ -44,36 +36,32 @@ public class Listeners implements Listener {
 					Player player = e.getPlayer();
 
 					Arena arena = Manager.getArena(player);
-					Inventory menu = Bukkit.createInventory(null, 9,
-							ChatColor.translateAlternateColorCodes('&', "&aChoose who to spectate!"));
-					int i = 0;
-					for (UUID uuid : Manager.getArena(e.getPlayer()).getPlayers()) {
+					// Inventory menu = Bukkit.createInventory(null, 9,
+					// ChatColor.translateAlternateColorCodes('&', "&aChoose who to spectate!"));
+					// int i = 0;
+					// for (UUID uuid : Manager.getArena(e.getPlayer()).getPlayers()) {
 
-						Player target = Bukkit.getPlayer(uuid);
-						if (target.getUniqueId() != player.getUniqueId() && !arena.getSpectators().contains(uuid)) {
-							ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) SkullType.PLAYER.ordinal());
-							SkullMeta meta = (SkullMeta) skull.getItemMeta();
+					// Player target = Bukkit.getPlayer(uuid);
+					// if (target.getUniqueId() != player.getUniqueId() &&
+					// !arena.getSpectators().contains(uuid)) {
+					// ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte)
+					// SkullType.PLAYER.ordinal());
+					// SkullMeta meta = (SkullMeta) skull.getItemMeta();
+//
+					// meta.setOwner(target.getName());
+					// if (arena.getGame(arena.getID()).isTeamGame()) {
+					// meta.setDisplayName(arena.getTeam(target).getColor() + target.getName());
+					// } else {
+					// meta.setDisplayName(HerobrinePVPCore.getFileManager().getRank(target).getColor()
+					// + target.getName());
+					// }
 
-							meta.setOwner(target.getName());
-							if (arena.getGame(arena.getID()).isTeamGame()) {
-								meta.setDisplayName(arena.getTeam(target).getColor() + target.getName());
-							} else {
-								meta.setDisplayName(HerobrinePVPCore.getFileManager().getRank(target).getColor()
-										+ target.getName());
-							}
-
-							skull.setItemMeta(meta);
-							menu.setItem(i, skull);
-							i++;
-						}
-					}
-					player.openInventory(menu);
-				} else {
-					e.getPlayer().sendMessage(ChatColor.RED + "You are not playing a game!");
+					// skull.setItemMeta(meta);
+					// menu.setItem(i, skull);
+					// i++;
 				}
-
 			}
-
+			// player.openInventory(menu);
 		}
 
 	}
@@ -83,6 +71,7 @@ public class Listeners implements Listener {
 		Player player = (Player) e.getWhoClicked();
 		if (Manager.isPlaying(player)) {
 
+
 			if (Manager.getArena(player).getSpectators().contains(player.getUniqueId())) {
 
 				e.setCancelled(true);
@@ -90,8 +79,9 @@ public class Listeners implements Listener {
 			}
 		}
 
-		if (ChatColor.translateAlternateColorCodes('&', e.getClickedInventory().getTitle())
-				.equals(ChatColor.translateAlternateColorCodes('&', "&aChoose who to spectate!"))) {
+		if (e.getClickedInventory() != null && e.getClickedInventory().getTitle() != null
+				&& ChatColor.translateAlternateColorCodes('&', e.getClickedInventory().getTitle())
+						.equals(ChatColor.translateAlternateColorCodes('&', "&aChoose who to spectate!"))) {
 			e.setCancelled(true);
 
 			if (e.getCurrentItem() != null && e.getCurrentItem().hasItemMeta()) {
@@ -115,7 +105,8 @@ public class Listeners implements Listener {
 
 			if (Manager.getArena(player).getSpectators().contains(player.getUniqueId())) {
 				e.setCancelled(true);
-			} else if (!Manager.getArena(player).getGame(Manager.getArena(player).getID()).equals(Games.BLOCK_HUNT)) {
+			} else if (!Manager.getArena(player).getGame(Manager.getArena(player).getID()).equals(Games.BLOCK_HUNT)
+					&& !Manager.getArena(player).getGame(Manager.getArena(player).getID()).equals(Games.WALLS_SG)) {
 				e.setCancelled(true);
 			}
 		}
@@ -130,7 +121,8 @@ public class Listeners implements Listener {
 				e.setCancelled(true);
 			}
 
-			else if (!Manager.getArena(player).getGame(Manager.getArena(player).getID()).equals(Games.BLOCK_HUNT)) {
+			else if (!Manager.getArena(player).getGame(Manager.getArena(player).getID()).equals(Games.BLOCK_HUNT)
+					&& Manager.getArena(player).getGame(Manager.getArena(player).getID()) != Games.WALLS_SG) {
 				e.setCancelled(true);
 			}
 		}

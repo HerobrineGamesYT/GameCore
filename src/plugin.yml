@@ -1,0 +1,22 @@
+main: net.herobrine.gamecore.GameCoreMain
+name: GameCore
+version: 1.1
+loadbefore: [BlockHunt, ClashRoyale]   
+commands:
+  join:
+    description: f
+  arena:
+    description: Arena management system for admins.
+  staffchat:
+    description: Send a message to all staff members. Why is it in GameCore? Don't ask me.
+    aliases: [sc]
+  skin:
+    description: Set your skin! (BETA)
+  lobby:
+    description: Return to the lobby if you are in a game!
+    aliases: [l,hub,leave]
+  spectate:
+    description: Spectate games as staff.
+    aliases: [spec]
+  shout:
+    description: Talk to everyone!

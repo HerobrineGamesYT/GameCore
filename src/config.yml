@@ -1,0 +1,73 @@
+countdown-seconds: 45
+lobby-spawn: 
+  world: 'Hypixel_Christmas_Lobby'
+  x: 38
+  y: 86
+  z: 22
+  pitch: 0
+  yaw: 90
+lobby-npc-spawn:
+  world: 'hypixelhub'
+  x: 189
+  y: 64
+  z: 5
+  pitch: 1
+  yaw: -89
+arenas:
+  '0':
+    game-type: 'bh'
+    required-players: 4
+    max-players: 10
+    game-world: 'bhMap0'
+    world: 'bhWait'
+    x: 17
+    y: 92
+    z: -13
+    pitch: 0
+    yaw: 0
+  '1':
+    game-type: 'bc'
+    required-players: 2
+    max-players: 10
+    game-world: 'arena10'
+    world: 'arena10'
+    x: 172
+    y: 32
+    z: -1436
+    pitch: -1
+    yaw: 7
+  '2':
+    game-type: 'wsg'
+    required-players: 2
+    max-players: 10
+    game-world: 'wallsMap'
+    world: 'wallsMap'
+    x: 484
+    y: 150
+    z: 452
+    pitch: 0
+    yaw: 0
+  '3':
+    game-type: 'bc'
+    required-players: 2
+    max-players: 10
+    game-mod: CLASH_ROYALE
+    game-world: 'clashMap'
+    world: 'clashMap'
+    x: 156
+    y: 102
+    z: 145
+    pitch: 90
+    yaw: 0
+  '4':
+    game-type: 'dc'
+    required-players: 2
+    max-players: 5
+    game-mod: DIMENTIO_TEST
+    game-world: 'dungeonTest'
+    world: 'dungeonTest'
+    x: -218.5
+    y: 4
+    z: 9.5
+    pitch: 1
+    yaw: 179

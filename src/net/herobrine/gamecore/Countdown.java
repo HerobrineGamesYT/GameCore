@@ -99,7 +99,7 @@ public class Countdown extends BukkitRunnable {
 				else if (vanillaVotes.size() < modifiedVotes.size()) {
 					winner = GameType.MODIFIER;
 					arena.sendMessage(ChatColor.translateAlternateColorCodes('&',
-							"&d&lVOTE! &eModifier game wins! Picking modifiers..."));
+							"&d&lVOTE! &eModifier game wins! Get ready to select your class!"));
 					arena.sendMessage(ChatColor.GREEN + "Votes for vanilla: " + vanillaVotes.size());
 					arena.sendMessage(ChatColor.GREEN + "Votes for modifier: " + modifiedVotes.size());
 

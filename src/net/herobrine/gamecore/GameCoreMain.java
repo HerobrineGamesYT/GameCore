@@ -8,8 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.herobrine.blockhunt.BlockHuntMain;
 import net.herobrine.core.HerobrinePVPCore;
-import net.herobrine.wallsg.BlockHuntMain;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
@@ -56,6 +56,12 @@ public class GameCoreMain extends JavaPlugin {
 
 		getCommand("skin").setExecutor(new SkinCommand());
 
+		getCommand("lobby").setExecutor(new LobbyCommand());
+
+		getCommand("spectate").setExecutor(new SpectateCommand());
+
+		getCommand("shout").setExecutor(new ShoutCommand());
+
 	}
 
 	public HerobrinePVPCore getCustomAPI() {
@@ -78,7 +84,7 @@ public class GameCoreMain extends JavaPlugin {
 		}
 	}
 
-	public void startQueue(Player player, Games game) {
+	public void startQueue(Player player, Games game, GameType type) {
 		int timesLooped = 0;
 		for (Arena arena : Manager.getArenas()) {
 			if (timesLooped == 0) {
@@ -97,7 +103,7 @@ public class GameCoreMain extends JavaPlugin {
 				if (arena.getPlayers().size() < Config.getMaxPlayers(arena.getID())) {
 
 					if (!arena.getState().equals(GameState.LIVE) && arena.canJoin()
-							&& arena.getGame(arena.getID()).equals(game)) {
+							&& arena.getGame(arena.getID()).equals(game) && arena.getType().equals(type)) {
 
 						arena.addPlayer(player);
 						player.sendMessage(ChatColor.GREEN + "Game found! You've been sent to game " + ChatColor.GOLD
@@ -160,4 +166,5 @@ public class GameCoreMain extends JavaPlugin {
 
 		((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(packet);
 	}
+
 }

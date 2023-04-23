@@ -30,6 +30,16 @@ public class Config {
 		return main.getConfig().getInt("countdown-seconds");
 	}
 
+	public static GameType getGameMod(int id) {
+
+		if (main.getConfig().getString("arenas." + id + ".game-mod") != null) {
+			return GameType.valueOf(main.getConfig().getString("arenas." + id + ".game-mod"));
+		}
+
+		return null;
+
+	}
+
 	public static Location getLobbySpawn() {
 		return new Location(Bukkit.getWorld(main.getConfig().getString("lobby-spawn.world")),
 				main.getConfig().getDouble("lobby-spawn.x"), main.getConfig().getDouble("lobby-spawn.y"),
