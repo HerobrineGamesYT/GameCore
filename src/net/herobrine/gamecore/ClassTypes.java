@@ -68,7 +68,17 @@ public enum ClassTypes {
 			"that the drops will be doubled."}, Games.WALLS_SG, false, 0, 0, 0, 0, false),
 	ENGINEER(ChatColor.GOLD + "Engineer", Material.FLINT_AND_STEEL, new String[] {ChatColor.BLUE + "Special Items:", ChatColor.GOLD + "- 1x Placeable Cannon", "",
 			ChatColor.GREEN + "Perk:", ChatColor.GREEN +"Can place a " + ChatColor.GOLD + "cannon " + ChatColor.GREEN + "that lets you", ChatColor.GREEN +
-			"shoot cannonballs at enemies!"}, Games.WALLS_SG, false, 0, 0, 0, 0, false);
+			"shoot cannonballs at enemies!"}, Games.WALLS_SG, false, 0, 0, 0, 0, false),
+	BERSERK(ChatColor.GREEN + "Berserker", Material.DIAMOND_SWORD, new String[] {""},
+			Games.DELTARUNE, false, 0,0,0,0,false),
+	ARCHER_DELTACRAFT(ChatColor.LIGHT_PURPLE + "Archer", Material.BOW, new String[] {},
+			Games.DELTARUNE, false, 0 ,0 ,0 ,0 , false),
+	MAGE(ChatColor.BLUE + "Mage", Material.BLAZE_ROD, new String[] {},
+			Games.DELTARUNE, false, 0 ,0 ,0 ,0, false),
+	TANK(ChatColor.RED + "Tank", Material.DIAMOND_CHESTPLATE,
+			new String[] {}, Games.DELTARUNE, false,0,0,0,0,false),
+	HEALER_DELTACRAFT(ChatColor.GOLD + "Healer", Material.GOLDEN_APPLE, new String[] {},
+			Games.DELTARUNE, false,0 ,0,0,0,  false);
 
 	// The display name of the class.
 	private String display;

@@ -2,6 +2,7 @@ package net.herobrine.gamecore;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -104,11 +105,32 @@ public class Countdown extends BukkitRunnable {
 					arena.sendMessage(ChatColor.GREEN + "Votes for modifier: " + modifiedVotes.size());
 
 				} else if (vanillaVotes.size() == modifiedVotes.size()) {
-					arena.sendMessage(ChatColor.translateAlternateColorCodes('&',
-							"&d&lVOTE! &eThe poll was a tie. Since we must proceed, Vanilla wins by default."));
-					arena.sendMessage(ChatColor.GREEN + "Votes for vanilla: " + vanillaVotes.size());
-					arena.sendMessage(ChatColor.GREEN + "Votes for modifier: " + modifiedVotes.size());
-					winner = GameType.VANILLA;
+
+					int randomNumber = ThreadLocalRandom.current().nextInt(1, 2);
+
+					if (randomNumber == 1) {
+						arena.sendMessage(ChatColor.translateAlternateColorCodes('&',
+								"&d&lVOTE! &eThe poll was a tie. We did a coinflip to choose the VANILLA game type!"));
+						arena.sendMessage(ChatColor.GREEN + "Votes for vanilla: " + vanillaVotes.size());
+						arena.sendMessage(ChatColor.GREEN + "Votes for modifier: " + modifiedVotes.size());
+
+						winner = GameType.VANILLA;
+					}
+
+					else if (randomNumber == 2) {
+						arena.sendMessage(ChatColor.translateAlternateColorCodes('&',
+								"&d&lVOTE! &eThe poll was a tie. We did a coinflip to choose the MODIFIER game type!"));
+						arena.sendMessage(ChatColor.GREEN + "Votes for vanilla: " + vanillaVotes.size());
+						arena.sendMessage(ChatColor.GREEN + "Votes for modifier: " + modifiedVotes.size());
+						winner = GameType.MODIFIER;
+					}
+
+					else {
+						arena.sendMessage("this shouldn't be possible. we're doin vanilla");
+						winner = GameType.VANILLA;
+					}
+
+
 
 				} else {
 					winner = GameType.VANILLA;

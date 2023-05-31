@@ -11,8 +11,12 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.mojang.authlib.properties.PropertyMap;
+import lombok.SneakyThrows;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,10 +29,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import net.herobrine.core.HerobrinePVPCore;
-import net.minecraft.server.v1_8_R3.Packet;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_8_R3.PacketPlayOutNamedEntitySpawn;
-import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo;
 
 public class SkinCommand implements CommandExecutor {
 
@@ -54,12 +54,13 @@ public class SkinCommand implements CommandExecutor {
 							player.sendMessage(
 									ChatColor.GREEN + "Your skin has been changed to " + args[0] + "'s skin!");
 
-						} catch (NullPointerException e) {
+						} catch (Exception e) {
 							player.sendMessage(ChatColor.RED + "Exception occurred. Try a different name?");
 						}
 
 					} else {
 						player.sendMessage(ChatColor.RED + "Invalid player name! Length > 16");
+						double tps = MinecraftServer.getServer().recentTps[0];
 					}
 
 				} else {
@@ -76,46 +77,73 @@ public class SkinCommand implements CommandExecutor {
 
 	}
 
-	public void setNameSkin(Player player, String skinName) {
+	public void setNameSkin(Player player, String skinName) throws Exception{
+		SkinSettings skinSettings = new SkinSettings();
 
-		String uuidData = get("https://api.mojang.com/users/profiles/minecraft/%s", skinName);
-		String uuid = getUUID(uuidData);
-		String skinData = get("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", uuid);
-		String skin = getSkin(skinData);
-		String signature = getSig(skinData);
+		String getUUID = skinSettings.get("https://api.mojang.com/users/profiles/minecraft/%s", skinName);
+		String uuid = skinSettings.getUUID(getUUID);
+		String skin = skinSettings.get("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", uuid);
 
-		CraftPlayer cp = ((CraftPlayer) player);
+		String sig = skinSettings.getSig(skin);
 
-		GameProfile profile = cp.getProfile();
+		System.out.println("Sig: " + sig + "\n");
 
-		sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER,
-				cp.getHandle()));
-		sendPacketNotFor(player, new PacketPlayOutEntityDestroy(cp.getEntityId()));
+		String data = skinSettings.getData(skin);
 
-		profile.getProperties().removeAll("textures");
-		profile.getProperties().put("textures", new Property("textures", skin, signature));
+		System.out.println("Data: " + data + "\n");
 
-		health.put(player, player.getHealth());
-		loc.put(player, player.getLocation());
+		EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
-		cp.setHealth(0);
+		int dimension = player.getWorld().getEnvironment().getId();
+		WorldSettings.EnumGamemode gamemode = WorldSettings.EnumGamemode.valueOf(player.getGameMode().name());
+		EnumDifficulty difficulty = (EnumDifficulty) EnumDifficulty.class.getDeclaredMethod("getById", int.class).invoke(null, player.getWorld().getDifficulty().getValue());
+		WorldType type = WorldType.getType(player.getWorld().getWorldType().getName());
+		final GameMode gameMode = player.getGameMode();
+		final boolean allowFlight = player.getAllowFlight();
+		final boolean flying = player.isFlying();
+		final Location location = player.getLocation();
+		final float pitch = location.getPitch(), yaw = location.getYaw();
+		final int heldItemSlot = player.getInventory().getHeldItemSlot();
+		final int level = player.getLevel();
+		final float xp = player.getExp();
+		final double maxHealth = player.getMaxHealth();
+		final double health = player.getHealth();
 
-		cp.spigot().respawn();
+		GameCoreMain.getInstance().sendPacket(player, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer));
 
-		sendPacket(
-				new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, cp.getHandle()));
+		GameProfile profile = entityPlayer.getProfile();
 
-		cp.setHealth(player.getHealth());
+		PropertyMap map = profile.getProperties();
+		map.clear();
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
+		map.put("textures", new Property("textures", data, sig));
 
-				sendPacketNotFor(player, new PacketPlayOutNamedEntitySpawn(cp.getHandle()));
-				cp.teleport(loc.get(player));
+		Bukkit.getScheduler().runTaskLater(GameCoreMain.getInstance(), () -> {
+			GameCoreMain.getInstance().sendPacket(player, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer));
+			GameCoreMain.getInstance().sendPacket(player, new PacketPlayOutRespawn(dimension, difficulty, type, gamemode));
+			player.setGameMode(gameMode);
+			player.setAllowFlight(allowFlight);
+			player.setFlying(flying);
+			player.updateInventory();
+			player.getInventory().setHeldItemSlot(heldItemSlot);
+			player.setLevel(level);
+			player.setExp(xp);
+			player.setMaxHealth(maxHealth);
+			player.setHealth(health);
 
-			}
-		}.runTaskLater(GameCoreMain.getInstance(), 20l);
+			location.setYaw(yaw);
+			location.setPitch(pitch);
+			player.teleport(location);
+
+		}, 0);
+
+
+		Bukkit.getOnlinePlayers().forEach(online -> {
+
+			online.hidePlayer(player);
+			online.showPlayer(player);
+
+		});
 
 	}
 
@@ -134,6 +162,7 @@ public class SkinCommand implements CommandExecutor {
 		}
 
 	}
+
 
 	public String get(String url, String arg) {
 		try {
@@ -185,7 +214,7 @@ public class SkinCommand implements CommandExecutor {
 	}
 
 	public String getUUID(String body) {
-		final Pattern pattern = Pattern.compile("id\":\"(.*?)\"}");
+		final Pattern pattern = Pattern.compile("id\" : \"(.*?)\"}");
 		final Matcher matcher = pattern.matcher(body);
 		matcher.find();
 		String id = matcher.group(1);

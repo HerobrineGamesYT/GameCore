@@ -164,6 +164,7 @@ public class Arena {
 	}
 
 	public void start(GameType type) {
+
 		if (getGame(id).equals(Games.BLOCK_HUNT)) {
 			setType(type);
 			blockHuntGame.startBlockHunt(type);
@@ -225,6 +226,7 @@ public class Arena {
 			player.setLevel(0);
 			player.getInventory().clear();
 			player.setHealth(20.0);
+			player.setMaxHealth(20.0);
 			player.getEnderChest().clear();
 			player.setDisplayName(player.getName());
 
@@ -272,7 +274,7 @@ public class Arena {
 
 		}
 
-		if (!getType().equals(GameType.CLASH_ROYALE)) {
+		if (!getType().equals(GameType.CLASH_ROYALE) && !getGame(id).equals(Games.DELTARUNE)) {
 			type = GameType.VANILLA;
 		}
 
@@ -499,7 +501,9 @@ public class Arena {
 			playerCount.setSuffix(ChatColor.translateAlternateColorCodes('&', "&a") + players.size() + ChatColor.GREEN
 					+ "/" + net.herobrine.gamecore.Config.getMaxPlayers(id));
 			obj.getScore(ChatColor.BLACK.toString()).setScore(2);
-			Score ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cherobrinepvp.beastmc.com"));
+			Score ip;
+			if(HerobrinePVPCore.getFileManager().getEnvironment().equals("PRODUCTION")) ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cherobrinepvp.beastmc.com"));
+			else ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cDevelopment Server"));
 			ip.setScore(1);
 			player.setCustomName(getGame(id).getColor() + player.getName());
 			player.setScoreboard(board);
@@ -522,8 +526,12 @@ public class Arena {
 			playerCount.setSuffix(ChatColor.translateAlternateColorCodes('&', "&a") + players.size() + ChatColor.GREEN
 					+ "/" + net.herobrine.gamecore.Config.getMaxPlayers(id));
 			obj.getScore(ChatColor.BLACK.toString()).setScore(4);
-			Score ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cherobrinepvp.beastmc.com"));
+
+			Score ip;
+			if(HerobrinePVPCore.getFileManager().getEnvironment().equals("PRODUCTION")) ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cherobrinepvp.beastmc.com"));
+			else ip = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&cDevelopment Server"));
 			ip.setScore(1);
+
 			player.setCustomName(getGame(id).getColor() + player.getName());
 			player.setScoreboard(board);
 		}
@@ -881,7 +889,6 @@ public class Arena {
 				break;
 
 			case JUGGERNAUT:
-
 				classes.put(uuid, new Juggernaut(uuid));
 				break;
 
