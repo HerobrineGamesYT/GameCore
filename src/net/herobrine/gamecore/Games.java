@@ -6,17 +6,17 @@ import org.bukkit.Material;
 public enum Games {
 
 	// Games without stat keys here were either scrapped or not developed yet.
-	BLOCK_HUNT(ChatColor.GREEN + "Block Hunt", "bh", ChatColor.GREEN, false, true, true, true, false, 2, 30, 100, 50, 100, false, Material.GRASS, null, null, true),
-	MLG_RUSH(ChatColor.RED + "MLG Rush", "mlg", ChatColor.RED, false, false, false, false, false, 0, 25, 100, 15, 30, false, Material.WATER_BUCKET, null, null, false),
-	BEDWARS(ChatColor.LIGHT_PURPLE + "Bedwars", "bw", ChatColor.LIGHT_PURPLE, true, true, false, false, false, 0, 150, 300, 45, 156, false, Material.BED, null, null, false),
-	SKYWARS(ChatColor.GOLD + "Skywars", "sw", ChatColor.GOLD, true, false, false, false, true, 0, 20, 100, 25, 45, false, Material.ENDER_PEARL, null, null, true),
-	FALL_CRAFT(ChatColor.AQUA + "Fall Craft", "fc", ChatColor.AQUA, false, false, false, false, false, 0, 150, 500, 150, 350, false, Material.FEATHER, null, null, false),
-	CLASH_ROYALE(ChatColor.AQUA + "Battle Clash", "bc", ChatColor.AQUA, true, true, false, false, true, 2, 35, 100, 15, 50, true, Material.DIAMOND_SWORD, new String[] {"wins", "kills", "roundsPlayed"}, new String[] {"Wins", "Kills", "Rounds Played"}, false),
-	WALLS_SG(ChatColor.YELLOW + "Walls SG", "wsg", ChatColor.YELLOW, true, true, true, false, false, 4, 50, 100, 20, 60, true, Material.DIAMOND_AXE, new String[] {"wins", "kills", "roundsPlayed"}, new String[] {"Wins", "Kills", "Rounds Played"}, false),
-	CLASH_MINI(ChatColor.GOLD + "Clash Mini", "cm", ChatColor.GOLD, false, false, false, false, false, 0, 60, 120, 25, 65, false, Material.NETHER_STAR, null, null, false),
-	DELTARUNE(ChatColor.RED + "Delta Craft", "dc", ChatColor.RED, false, false, false, false, false, 0, 100, 1000, 100, 1000, false, Material.EYE_OF_ENDER, null, null, false),
-	WORKSHOP(ChatColor.BLUE + "Workshop", "tc", ChatColor.BLUE, false, false, false, false ,false,
-	0,50, 300, 30, 50, false, Material.WORKBENCH, null, null, false);
+	BLOCK_HUNT(ChatColor.GREEN + "Block Hunt", "bh", ChatColor.GREEN, false, true, true, true, false, false, true ,2, 30, 100, 50, 100, false, Material.GRASS, null, null, true),
+	MLG_RUSH(ChatColor.RED + "MLG Rush", "mlg", ChatColor.RED, false, false, false, false, false, false, false,0, 25, 100, 15, 30, false, Material.WATER_BUCKET, null, null, false),
+	BEDWARS(ChatColor.LIGHT_PURPLE + "Bedwars", "bw", ChatColor.LIGHT_PURPLE, true, true, false, false, false, false, true, 0, 150, 300, 45, 156, false, Material.BED, null, null, false),
+	SKYWARS(ChatColor.GOLD + "Skywars", "sw", ChatColor.GOLD, true, false, false, false, true, true, true, 0, 20, 100, 25, 45, false, Material.ENDER_PEARL, null, null, true),
+	FALL_CRAFT(ChatColor.AQUA + "Fall Craft", "fc", ChatColor.AQUA, false, false, false, false, false, false, true, 0, 150, 500, 150, 350, false, Material.FEATHER, null, null, false),
+	CLASH_ROYALE(ChatColor.AQUA + "Battle Clash", "bc", ChatColor.AQUA, true, true, false, false, true, true,true, 2, 35, 100, 15, 50, true, Material.DIAMOND_SWORD, new String[] {"wins", "kills", "roundsPlayed", "class"}, new String[] {"Wins", "Kills", "Rounds Played", "Preferred Class"}, false),
+	WALLS_SG(ChatColor.YELLOW + "Walls SG", "wsg", ChatColor.YELLOW, true, true, true, false, true, false, true, 4, 50, 100, 20, 60, true, Material.DIAMOND_AXE, new String[] {"wins", "kills", "roundsPlayed"}, new String[] {"Wins", "Kills", "Rounds Played"}, false),
+	CLASH_MINI(ChatColor.GOLD + "Clash Mini", "cm", ChatColor.GOLD, false, false, false, false, false, false, true, 0, 60, 120, 25, 65, false, Material.NETHER_STAR, null, null, false),
+	DELTARUNE(ChatColor.RED + "Delta Craft", "dc", ChatColor.RED, false, false, false, false, true, false, true,0, 100, 1000, 100, 1000, false, Material.EYE_OF_ENDER, new String[] {"roundsPlayed", "wins", "class"}, new String[] {"Runs Played", "Runs Completed", "Preferred Class"}, false),
+	WORKSHOP(ChatColor.BLUE + "Workshop", "tc", ChatColor.BLUE, false, false, false, false ,false, false,
+	false,0,50, 300, 30, 50, false, Material.WORKBENCH, null, null, false);
 
 	private String display;
 	private String key;
@@ -26,6 +26,9 @@ public enum Games {
 	private boolean hasVoting;
 	private boolean newWorldEachGame;
 	private boolean hasKits;
+
+	private boolean hasClassSelector;
+	private boolean hasEntities;
 	private int teamCount;
 	private int baseCoins;
 	private int baseWinCoins;
@@ -37,7 +40,7 @@ public enum Games {
 	private String[] friendlyStatKeys;
 	private boolean hasCrafting;
 	private Games(String display, String key, ChatColor color, boolean isPVPGame, boolean isTeamGame, boolean hasVoting,
-			boolean newWorldEachGame, boolean hasKits, int teamCount, int baseCoins, int baseWinCoins, int baseXP, int baseWinXP, boolean showStats, Material statsItem, String[] statKeys, String[] friendlyStatKeys, boolean hasCrafting) {
+			boolean newWorldEachGame, boolean hasKits, boolean hasClassSelector, boolean hasEntities, int teamCount, int baseCoins, int baseWinCoins, int baseXP, int baseWinXP, boolean showStats, Material statsItem, String[] statKeys, String[] friendlyStatKeys, boolean hasCrafting) {
 		this.display = display;
 		this.key = key;
 		this.color = color;
@@ -46,6 +49,8 @@ public enum Games {
 		this.hasVoting = hasVoting;
 		this.newWorldEachGame = newWorldEachGame;
 		this.hasKits = hasKits;
+		this.hasClassSelector = hasClassSelector;
+		this.hasEntities = hasEntities;
 		this.teamCount = teamCount;
 		this.baseCoins  = baseCoins;
 		this.baseWinCoins = baseWinCoins;
@@ -95,6 +100,10 @@ public enum Games {
 	public boolean hasKits() {
 		return hasKits;
 	}
+
+	public boolean hasClassSelector() {return hasClassSelector;}
+
+	public boolean hasEntities() {return hasEntities;}
 
 	public int getBaseCoins() {return baseCoins;}
 

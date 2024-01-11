@@ -20,3 +20,6 @@ commands:
     aliases: [spec]
   shout:
     description: Talk to everyone!
+
+  summonplayers:
+    description: Send all players who aren't in a live game, to yours! Bypasses the arena's player limit.
