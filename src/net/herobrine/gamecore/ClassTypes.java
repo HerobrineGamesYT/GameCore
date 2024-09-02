@@ -78,7 +78,20 @@ public enum ClassTypes {
 	TANK(ChatColor.RED + "Tank", Material.DIAMOND_CHESTPLATE,
 			new String[] {}, Games.DELTARUNE, false,0,0,0,0,false),
 	HEALER_DELTACRAFT(ChatColor.GOLD + "Healer", Material.GOLDEN_APPLE, new String[] {},
-			Games.DELTARUNE, false,0 ,0,0,0,  false);
+			Games.DELTARUNE, false,0 ,0,0,0,  false),
+	ONEFORALL(ChatColor.GREEN + "One For All", Material.GLOWSTONE_DUST, new String[] {ChatColor.DARK_GRAY + "Accumulation, Multi-Type","",ChatColor.GRAY + "Charge up your stamina to power",
+			ChatColor.GRAY +  "up your abilities and attacks!"},
+			Games.QUIRK_BATTTLE, false, 4,0,0,0,false),
+	EXPLOSION(ChatColor.GOLD + "Explosion", Material.FIREBALL, new String[] {ChatColor.DARK_GRAY + "Accumulation", "", ChatColor.GRAY + "Attack to gain stamina and fuel your abilities!"},
+			Games.QUIRK_BATTTLE, false, 5, 0, 0,0, false),
+	HARDENING(ChatColor.RED + "Hardening", Material.STONE, new String[] {ChatColor.DARK_GRAY + "Transformation", "", ChatColor.GRAY + "Soak up damage to gain stamina to transform", ChatColor.GRAY + "into a tanky high-damage fighter!"},
+			Games.QUIRK_BATTTLE, false, 3,0,0,0,false),
+	ICYHOT(ChatColor.BLUE + "Half-Cold " + ChatColor.RED + "Half-Hot", Material.BLAZE_ROD, new String[] {},
+			Games.QUIRK_BATTTLE, false, 0,0,0,0,false),
+	ERASURE(ChatColor.RED + "Erasure", Material.REDSTONE, new String[] {},
+			Games.QUIRK_BATTTLE, false, 0,0,0,0, false),
+	ZEROGRAVITY(ChatColor.LIGHT_PURPLE + "Zero Gravity", Material.INK_SACK, new String[] {},
+			Games.QUIRK_BATTTLE, false, 0,0, 0,0,false);
 
 	// The display name of the class.
 	private String display;

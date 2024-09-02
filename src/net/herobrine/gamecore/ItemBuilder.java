@@ -39,6 +39,11 @@ public class ItemBuilder {
 		return this;
 	}
 
+	public ItemBuilder setType(Material mat) {
+		stack.setType(mat);
+		return this;
+	}
+
 	public ItemBuilder setGlow(boolean glow) {
 		if (glow) {
 			addEnchant(Enchantment.DURABILITY, 1);
@@ -47,14 +52,22 @@ public class ItemBuilder {
 			ItemMeta meta = getItemMeta();
 			for (Enchantment enchantment : meta.getEnchants().keySet()) {
 				meta.removeEnchant(enchantment);
-
-
-
 			}
 		}
 		return this;
 	}
 
+	public ItemBuilder updateLine(int index, String newLore) {
+		ArrayList<String> lore1 = new ArrayList<String>(getItemMeta().getLore());
+		lore1.set(index, newLore);
+		setLore(lore1);
+		return this;
+	}
+
+	public ItemBuilder setDurability(short durability) {
+		stack.setDurability(durability);
+		return this;
+	}
 	public ItemBuilder setUnbreakable(boolean unbreakable) {
 		ItemMeta meta = stack.getItemMeta();
 		meta.spigot().setUnbreakable(unbreakable);

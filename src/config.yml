@@ -1,5 +1,5 @@
 countdown-seconds: 45
-lobby-spawn: 
+lobby-spawn:
   world: 'Hypixel_Christmas_Lobby'
   x: 38
   y: 86
@@ -61,7 +61,7 @@ arenas:
     yaw: 0
   '4':
     game-type: 'dc'
-    required-players: 2
+    required-players: 1
     max-players: 5
     game-mod: DIMENTIO_TEST
     game-world: 'dungeonTest'
@@ -71,3 +71,51 @@ arenas:
     z: 9.5
     pitch: 1
     yaw: 179
+  '5':
+    game-type: 'qb'
+    required-players: 2
+    max-players: 2
+    game-mod: ONE_V_ONE
+    game-world: 'myhero'
+    world: 'myhero'
+    x: 986.5
+    y: 4
+    z: -446.5
+    pitch: 1
+    yaw: -90
+  '6':
+    game-type: 'qb'
+    required-players: 4
+    max-players: 4
+    game-mod: TWO_V_TWO
+    game-world: 'myhero'
+    world: 'myhero'
+    x: 986.5
+    y: 4
+    z: -446.5
+    pitch: 1
+    yaw: -90
+  '7':
+    game-type: 'qb'
+    required-players: 6
+    max-players: 6
+    game-mod: THREE_V_THREE
+    game-world: 'myhero'
+    world: 'myhero'
+    x: 986.5
+    y: 4
+    z: -446.5
+    pitch: 1
+    yaw: -90
+  '8':
+    game-type: 'qb'
+    required-players: 8
+    max-players: 8
+    game-mod: FOUR_V_FOUR
+    game-world: 'myhero'
+    world: 'myhero'
+    x: 986.5
+    y: 4
+    z: -446.5
+    pitch: 1
+    yaw: -90

@@ -19,9 +19,6 @@ public class Listeners implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().teleport(Config.getLobbySpawn());
-		e.getPlayer().setExp(0.0F);
-		e.getPlayer().setLevel(0);
-
 	}
 
 	@EventHandler

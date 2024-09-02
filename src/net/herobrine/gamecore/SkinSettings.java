@@ -16,7 +16,7 @@ public class SkinSettings {
         HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format(url, name)).openConnection();
 
         if (connection.getResponseCode() != 200) {
-            System.out.println("An error has occurred: RESPONSE_CODE");
+            System.out.println("An error has occurred: RESPONSE_CODE (" + connection.getResponseCode() + ")");
         } else {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder builder = new StringBuilder();

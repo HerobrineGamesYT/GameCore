@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -16,9 +17,12 @@ public class Countdown extends BukkitRunnable {
 	private static ArrayList<UUID> modifiedVotes = new ArrayList<UUID>();
 	private GameType winner;
 
+	private boolean isPaused;
+
 	public Countdown(Arena arena) {
 		this.arena = arena;
 		this.seconds = Config.getCountdownSeconds();
+		this.isPaused = false;
 	}
 
 	public void begin() {
@@ -32,6 +36,10 @@ public class Countdown extends BukkitRunnable {
 		this.runTaskTimer(GameCoreMain.getInstance(), 0, 20);
 
 	}
+
+	public void pause() {isPaused = true;}
+
+	public void resume() {isPaused = false;}
 
 	public void startVote() {
 		arena.sendMessage(ChatColor.translateAlternateColorCodes('&',
@@ -79,7 +87,7 @@ public class Countdown extends BukkitRunnable {
 			cancel();
 		}
 
-		if (seconds == 0) {
+		if (seconds == 0 && !isPaused) {
 			cancel();
 			if (!arena.getGame(arena.getID()).hasVoting()) {
 
@@ -189,7 +197,7 @@ public class Countdown extends BukkitRunnable {
 			}
 		}
 
-		seconds--;
+	if(!isPaused) seconds--;
 	}
 
 }

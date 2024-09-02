@@ -19,6 +19,8 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutTitle.EnumTitleAction;
 public class GameCoreMain extends JavaPlugin {
 	private static GameCoreMain instance;
 
+	private Config config;
+
 	public static GameCoreMain getInstance() {
 
 		return instance;
@@ -27,7 +29,7 @@ public class GameCoreMain extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		GameCoreMain.instance = this;
-		new Config(this);
+		config = new Config(this);
 
 		if (getCustomAPI() == null) {
 			System.out.println(
@@ -61,6 +63,8 @@ public class GameCoreMain extends JavaPlugin {
 		getCommand("spectate").setExecutor(new SpectateCommand());
 
 		getCommand("shout").setExecutor(new ShoutCommand());
+
+		getCommand("summonplayers").setExecutor(new SummonCommand());
 
 	}
 
@@ -166,5 +170,7 @@ public class GameCoreMain extends JavaPlugin {
 
 		((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(packet);
 	}
+
+	public Config getConfigInstance(){return config;}
 
 }
