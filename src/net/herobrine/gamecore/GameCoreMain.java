@@ -92,7 +92,9 @@ public class GameCoreMain extends JavaPlugin {
 		int timesLooped = 0;
 		for (Arena arena : Manager.getArenas()) {
 			if (timesLooped == 0) {
-				player.sendMessage(ChatColor.GRAY + "Searching for a game of " + game.getDisplay());
+
+				if (type == GameType.VANILLA) player.sendMessage(ChatColor.GRAY + "Searching for a game of " + game.getDisplay());
+				else player.sendMessage(ChatColor.GRAY + "Searching for a game of " + game.getDisplay() + ChatColor.GRAY + " (" + type.getColor() + type.getDisplay() + ChatColor.GRAY + ")");
 
 			} else if (timesLooped == Manager.getArenas().size()) {
 

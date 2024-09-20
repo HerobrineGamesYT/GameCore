@@ -619,6 +619,11 @@ public class Arena {
 			}
 		}
 		if (getGame().equals(Games.DELTARUNE)) getDeltaGame().getReadiedPlayers().remove(player.getUniqueId());
+		if (getGame().equals(Games.QUIRK_BATTTLE) && getState().equals(GameState.LIVE)) {
+			getQuirkBattleGame().getAlivePlayers().remove(player.getUniqueId());
+			if (type.isTeamsMode()) getQuirkBattleGame().removeAlivePlayer(getTeam(player));
+			else getQuirkBattleGame().isGameOver();
+		}
 		removeTeam(player);
 		removeClass(player.getUniqueId());
 		removeSpectator(player);
